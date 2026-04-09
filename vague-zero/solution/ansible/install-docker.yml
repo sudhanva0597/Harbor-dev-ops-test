@@ -1,0 +1,48 @@
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Wait for apt lock release
+      shell: |
+        while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 || sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+          sleep 5
+        done
+
+    - name: Install dependencies
+      shell: |
+        apt-get update -y
+        apt-get install -y ca-certificates curl gnupg
+
+    - name: Add Docker GPG key
+      shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker repo
+      shell: |
+        echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+        https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
+        > /etc/apt/sources.list.d/docker.list
+
+    - name: Install Docker
+      shell: |
+        apt-get update -y
+        apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+    - name: Start Docker (systemd if available, else fallback)
+      shell: |
+        if command -v systemctl >/dev/null 2>&1; then
+          systemctl start docker
+          systemctl enable docker
+        else
+          # fallback for containers without systemd
+          nohup dockerd > /tmp/dockerd.log 2>&1 &
+          sleep 5
+        fi
+
+    - name: Add current user to docker group
+      user:
+        name: "{{ lookup('env','USER') }}"
+        groups: docker
+        append: yes

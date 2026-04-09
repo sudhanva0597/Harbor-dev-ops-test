@@ -51,12 +51,13 @@ The repo contains folders appropriately titled vague-zero, test-complete-zero, t
 These folders are identical except for the instruction.md file which contains the prompt.
 Each of these when run with -k 10 (10 runs of the job) ended with the percentage passing points that correspond to the folder name.
 
-#   Name   Duration    Result	Log	Notes
-1	vague-zero  12m40s	0/10 passed The instruction is vague, and the model fails to create what we ask for. All tests fail. 
-2	test-complete-zero    12m58s	0/10 passed The prompt is a lot more cleaner and docker is installed and containers are brought up, passing 2 out of 3 tests, but curl fails.
-3	test-fifty  11m7s   5/10 passed The prompt is even more refined, and 5 runs pass all three tests, the other 5 runs fail 1 test.
-4	test-seventy    10m34s  7/10 passed The prompt is more specific about what is needed and and 7 out of 10 runs pass all 3 tests. 3 runs fail 1 test.
-5	test-hundred    10m40s  10/10 passed    The prompt mentions how it will be tested (specifically curl /checkdb) and that it expects the result. The agent verifies the same output before stopping. All 10 runs pass.
+| Number | Name               | Duration | Result | Notes                                                                                                                                                                                         |
+| ------ | ------------------ | -------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1      | vague-zero         | 12m40s   | 0/10   | The prompt is vague, and the model fails to create what we ask for.                                                                                                                           |
+| 2      | test-complete-zero | 12m58s   | 0/10   | The prompt is a lot more clear and close to creating what we want. Ansible and docker are installed and brought up, but curl fails                                                            |
+| 3      | test-fifty         | 11m7s    | 5/10   | The prompt is more defined, and 5 runs pass all 3 tests. The rest pass 2/3 tests.                                                                                                             |
+| 4      | test-seventy       | 10m34s   | 7/10   | The prompt is more refined setting expectations. 7 runs pass 3/3 tests, 3 runs pass 2/3 tests.                                                                                                |
+| 5      | test-hundred       | 10m40s   | 10/10  | The prompt mentions how it will be tested (specifically curl to /checkdb) and that it expects the response it does. The agent verifies the same in it's loop, and all 10 runs pass 3/3 tests. |
 
 Key findings:
 

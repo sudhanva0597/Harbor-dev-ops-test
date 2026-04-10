@@ -1,33 +1,23 @@
 import subprocess
 import requests
+import time
 
-
-def get_base_urls():
-    # In Harbour, verifier runs in a different container.
-    # Host-mapped ports are reachable via host.docker.internal
-    return [
-        "http://localhost:8080",
-        "http://host.docker.internal:8080",
-    ]
-
+BASE_URL = "http://host.docker.internal:8080"
 
 def test_checkdb_endpoint():
-    # retry across endpoints + time to allow service readiness
     for _ in range(30):
-        for base in get_base_urls():
-            try:
-                r = requests.get(f"{base}/checkdb", timeout=2)
-                if r.status_code != 200:
-                    continue
+        try:
+            r = requests.get(f"{BASE_URL}/checkdb", timeout=2)
+            if r.status_code != 200:
+                continue
 
-                # Minimal check: ensure response has content and includes column + 1
-                body = r.text or ""
-                assert body
-                if "1" in body and "column" in body.lower():
-                    return
-            except Exception:
-                pass
-        import time
+            # Minimal check: ensure response has content and includes column + 1
+            body = r.text or ""
+            assert body
+            if "1" in body and "column" in body.lower():
+                return
+        except Exception:
+            pass
 
         time.sleep(2)
     raise AssertionError("checkdb endpoint not reachable or invalid response")
